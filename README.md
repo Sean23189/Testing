@@ -1,3 +1,1 @@
-Just a repo to test some code!
-
-beta feature blah blah blah
+Just a repo to test some code in python
