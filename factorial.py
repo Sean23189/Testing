@@ -5,7 +5,8 @@ def factorial(num):
         num -= 1
 
     return result
-    
-num = int(input("Enter the number you want to get the factorial of: "))      
+
+
+num = int(input("Enter the number you want to get the factorial of: "))
 result = factorial(num)
 print(f"The factorial of {num} is {result}")

@@ -9,4 +9,3 @@ elif num1 > num2:
 
 else:
     print(f"{num1} is less than {num2}.")
-    
