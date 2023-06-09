@@ -71,7 +71,7 @@ def main():
     print(f"Inaccessible: {counters.inaccessible}")
     print(f"Elapsed Time: {elapsed_time:.2f} seconds")
     print("\nAdditional Statistics:")
-    print("File Extensions:")
+    print("File Extensions (sorted by occurrence count):")
     sorted_extensions = sorted(counters.file_extensions.items(), key=lambda x: x[1], reverse=True)
     for extension, count in sorted_extensions:
         print(f"{extension}: {count}")
