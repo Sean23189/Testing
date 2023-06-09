@@ -13,26 +13,25 @@ class Counters:
         self.largest_file = {"name": "", "size": 0}
         self.total_size = 0
 
-def list_files(path, indentation='', counters=None):
+def list_files(path, counters=None):
     try:
-        for item in sorted(os.listdir(path)):
-            item_path = os.path.join(path, item)
-            if os.path.isfile(item_path):
-                print(f'{indentation}|- {item}')
+        for item in os.scandir(path):
+            if item.is_file():
+                print(f'{item.path}')
                 counters.files += 1
-                file_extension = os.path.splitext(item)[1]
+                file_extension = os.path.splitext(item.name)[1]
                 counters.file_extensions[file_extension] = counters.file_extensions.get(file_extension, 0) + 1
-                file_size = os.path.getsize(item_path)
+                file_size = item.stat().st_size
                 counters.total_size += file_size
                 if file_size > counters.largest_file["size"]:
-                    counters.largest_file["name"] = item
+                    counters.largest_file["name"] = item.name
                     counters.largest_file["size"] = file_size
-            elif os.path.isdir(item_path):
-                print(f'{indentation}|+ {item}')
+            elif item.is_dir():
+                print(f'{item.path}')
                 counters.directories += 1
-                list_files(item_path, indentation + '|  ', counters)
+                list_files(item.path, counters)
     except PermissionError:
-        print(f'{indentation}|! Permission denied: {Path(path).resolve()}')
+        print(f'Permission denied: {Path(path).resolve()}')
         counters.inaccessible += 1
 
 def convert_size(size_bytes):
@@ -44,7 +43,8 @@ def convert_size(size_bytes):
     return f"{size} {size_names[i]}"
 
 def traverse_directory(root_directory, counters):
-    list_files(root_directory, counters=counters)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.submit(list_files, root_directory, counters)
 
 def main():
     root_directory = input("Enter the root directory path: ")
@@ -59,8 +59,7 @@ def main():
 
     start_time = time.time()
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.submit(traverse_directory, root_directory, counters)
+    traverse_directory(root_directory, counters)
 
     end_time = time.time()
     elapsed_time = end_time - start_time
